@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>list</title>
+    <script src="../js/rem.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
+    <style>
+        .list {
+            width: 100%;
+        }
+
+        .list .head {
+            width: 100%;
+            height: 0.98rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #38f;
+            color: #fff;
+            font-size: 0.32rem;
+        }
+
+        .list .content {
+            width: 96%;
+            margin: 0 auto;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .list .content .content-item {
+            width: 49%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 2%;
+            /* border: 1px solid #e4e4e4; */
+            box-shadow: 1px 1px 2px #e4e4e4, -1px -1px 2px #e4e4e4;
+            display: none;
+        }
+
+        .list .content .content-item.active {
+            animation: content-item-active .3s linear both;
+        }
+
+        @keyframes content-item-active {
+            0% {
+                opacity: 0;
+                transform: translateY(10%);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .list .content .content-item img {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        .list .content .content-item span {
+            font-size: 0.32rem;
+            margin-top: 0.1rem;
+            display: block;
+            width:100%;
+            color:#666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="list">
+        <div class="head">
+            <span>列表</span>
+        </div>
+        <div class="content">
+            <div class="content-item">
+                <img src="../images/1.jpg" alt="">
+                <span>1.jpg</span>
+            </div>
+            <div class="content-item">
+                <img src="../images/2.jpg" alt="">
+                <span>2.jpg</span>
+            </div>
+            <div class="content-item">
+                <img src="../images/3.jpg" alt="">
+                <span>3.jpg</span>
+            </div>
+            <div class="content-item">
+                <img src="../images/4.jpg" alt="">
+                <span>4.jpg</span>
+            </div>
+            <div class="content-item">
+                <img src="../images/5.jpg" alt="">
+                <span>5.jpg</span>
+            </div>
+            <div class="content-item">
+                <img src="../images/6.jpg" alt="">
+                <span>6.jpg</span>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+    <script>
+        $(function () {
+            var waterFall = {
+                column: 2,  // 获取图片的列数
+                heightInterval: 5, //各项高度间隔
+                heightArr: [], // 高度数组
+                render: function () {
+                    var that = this;
+                    that.heightArr = [];
+                    for (var i = 0; i < that.column; i++) {
+                        that.heightArr[i] = that.heightInterval;
+                    }
+                    console.log(that.heightArr);
+                    // 遍历所有图片进行定位处理
+                    $('.content>.content-item:not(.active)').each(function (index, item) {
+                        $(item).show().addClass('active');
+                        // 当前元素的高度
+                        var itemHeight = $(item).outerHeight();
+                        // 高度数组最小的高度
+                        var minHeight = Math.min.apply(null, that.heightArr);
+                        // 高度数组最小高度的索引
+                        var minHeightIndex = that.heightArr.indexOf(minHeight);
+                        //设置布局
+                        $(item).css({
+                            position: 'absolute',
+                            top: minHeight + 'px',
+                            left: minHeightIndex % 2 == 0 ? '51%' : '0%'
+                        });
+                        //更新最小高度
+                        that.heightArr[minHeightIndex] += itemHeight + that.heightInterval;
+                        //更新父元素高度
+                        $(item).parent().height(Math.max.apply(null, that.heightArr));
+                        setTimeout(function(){
+                            $(item).removeClass('active').attr('already-load',1);
+                        }, 400);
+                    });
+                },
+                resize: function () {
+                    var that = this;
+                    that.heightArr = [5, 5];
+                    // 遍历所有图片进行定位处理
+                    $('.content>.content-item').each(function (index, item) {
+                        $(item).show().addClass('active');
+                        // 当前元素的高度
+                        var itemHeight = $(item).outerHeight();
+                        // 高度数组最小的高度
+                        var minHeight = Math.min.apply(null, that.heightArr);
+                        // 高度数组最小高度的索引
+                        var minHeightIndex = that.heightArr.indexOf(minHeight);
+                        //设置布局
+                        $(item).css({
+                            position: 'absolute',
+                            top: minHeight + 'px',
+                            left: minHeightIndex % 2 == 0 ? '51%' : '0%'
+                        });
+                        //更新最小高度
+                        that.heightArr[minHeightIndex] += itemHeight + that.heightInterval;
+                        //更新父元素高度
+                        $(item).parent().height(Math.max.apply(null, that.heightArr));
+                        setTimeout(function(){
+                            $(item).removeClass('active');
+                        }, 400);
+                    });
+                }
+            };
+            waterFall.render();
+            $(window).on('resize', function () {
+                waterFall.resize();
+            });
+        });
+    </script>
+</body>
+
+</html>
